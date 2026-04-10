@@ -1,0 +1,51 @@
+name: festive_alby
+services:
+  agent-zero:
+    cpu_shares: 90
+    command: []
+    container_name: agent-zero
+    deploy:
+      resources:
+        limits:
+          memory: 8063M
+    environment:
+      - TZ=Europe/Berlin
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    hostname: agent-zero
+    image: agent0ai/agent-zero:ready
+    labels:
+      icon: https://avatars.githubusercontent.com/u/216033749?s=280&v=4
+    ports:
+      - target: 80
+        published: "50080"
+        protocol: tcp
+      - target: 22
+        published: "50022"
+        protocol: tcp
+    privileged: true
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/agent-zero
+        target: /a0
+    devices: []
+    cap_add: []
+    networks:
+      - ollama
+networks:
+  ollama:
+    name: ollama
+x-casaos:
+  author: self
+  category: self
+  hostname: agent0.gabrielcmoris.com
+  icon: https://avatars.githubusercontent.com/u/216033749?s=280&v=4
+  index: /
+  is_uncontrolled: false
+  port_map: ""
+  scheme: https
+  store_app_id: festive_alby
+  title:
+    custom: ""
+    en_us: agent-zero
