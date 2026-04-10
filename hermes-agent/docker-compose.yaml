@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     # Running as root to allow the agent to install apps, brew, and skills dynamically
     user: "0:0"
-    command: gateway run
+    command: ["gateway", "run"]
     environment:
       # Inference Provider: NVIDIA NIM (build.nvidia.com)
       - HERMES_INFERENCE_PROVIDER=nvidia
