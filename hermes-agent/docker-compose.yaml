@@ -1,62 +1,93 @@
-version: "3.8"
-
+name: flourishing_et
 services:
-  # Core Hermes Agent Service
   hermes-agent:
-    image: nousresearch/hermes-agent:latest
+    cpu_shares: 90
+    command:
+      - gateway
+      - run
     container_name: agent-hermes
-    restart: unless-stopped
-    # Running as root to allow the agent to install apps, brew, and skills dynamically
-    user: "0:0"
-    command: ["gateway", "run"]
+    deploy:
+      resources:
+        limits:
+          memory: 8063M
     environment:
-      # Inference Provider: NVIDIA NIM (build.nvidia.com)
-      - HERMES_INFERENCE_PROVIDER=nvidia
-      - NVIDIA_API_KEY={NVIDIA_API_KEY}
-      - OPENAI_BASE_URL=https://integrate.api.nvidia.com/v1
-      - LLM_MODEL=z-ai/glm5
-      
-      # API Server for external Open WebUI or other frontends
       - API_SERVER_ENABLED=true
-      - API_SERVER_KEY=sk_hermes_1234567890qwertyuiopasdfghjklzxc
       - API_SERVER_HOST=0.0.0.0
+      - API_SERVER_KEY=sk_hermes_GENERATE_AN_API_KEY
       - API_SERVER_PORT=8642
-      
-      # Telegram Bot Configuration
-      - TELEGRAM_BOT_TOKEN={TELEGTRAM_BOT_TOKEN}
-      - TELEGRAM_ALLOWED_USERS={USER_ID}
-      
-      # Persistence and System Paths
-      - HERMES_HOME=/opt/data
-      - MESSAGING_CWD=/opt/data/workspace
-    volumes:
-      # Deep persistence in the requested host path
-      - ./DATA/AppData/agentHermes:/opt/data
-    # Shared memory for browser tools (Playwright/Chromium)
-    shm_size: "3gb"
-    networks:
-      - hermes-net
-
-  # Hermes WebUI: Parity with the CLI experience
-  hermes-webui:
-    image: ghcr.io/nesquena/hermes-webui:latest
-    container_name: webui-hermes
-    restart: unless-stopped
+      - HERMES_HOME=/root/.hermes
+      - MESSAGING_CWD=/root/.hermes/workspace
+      - TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_TOKEN
+    hostname: agent-hermes
+    image: nousresearch/hermes-agent:latest
+    labels:
+      icon: https://hermes-agent.nousresearch.com/docs/img/logo.png
     ports:
-      - "8787:8787"
+      - target: 8642
+        published: "8642"
+        protocol: tcp
+    privileged: true
+    restart: unless-stopped
+    shm_size: "3221225472"
+    user: 0:0
+    volumes:
+      - type: bind
+        source: /DATA/AppData/agentHermes
+        target: /root/.hermes
+    devices: []
+    cap_add: []
+    networks:
+      - ollama
+  hermes-webui:
+    cpu_shares: 90
+    command: []
+    container_name: webui-hermes
+    depends_on:
+      hermes-agent:
+        condition: service_started
+        required: true
+    deploy:
+      resources:
+        limits:
+          memory: 8063M
     environment:
       - HERMES_WEBUI_HOST=0.0.0.0
+      - HERMES_WEBUI_PASSWORD=YOUR_PASSWORD_FOR_WEBUI
       - HERMES_WEBUI_PORT=8787
-      - HERMES_HOME=/root/.hermes
-      - HERMES_WEBUI_PASSWORD={YOUR_UI_PASSWORD}
+      - HERMES_WEBUI_STATE_DIR=/webui-state
+      - OPENAI_API_BASE_URL=http://hermes-agent:8642/v1
+      - OPENAI_API_KEY=sk_hermes_GENERATE_AN_API_KEY
+    hostname: webui-hermes
+    image: ghcr.io/nesquena/hermes-webui:latest
+    labels:
+      icon: https://hermes-agent.nousresearch.com/docs/img/logo.png
+    ports:
+      - target: 8787
+        published: "8787"
+        protocol: tcp
+    privileged: true
+    restart: unless-stopped
     volumes:
-      # Mount the same data directory for state synchronization
-      - ./DATA/AppData/agentHermes:/root/.hermes
-    depends_on:
-      - hermes-agent
+      - type: bind
+        source: /DATA/AppData/agentHermes
+        target: /root/.hermes
+    devices: []
+    cap_add: []
     networks:
-      - hermes-net
-
+      - ollama
 networks:
-  hermes-net:
-    driver: bridge
+  ollama:
+    name: ollama
+x-casaos:
+  author: self
+  category: self
+  hostname: hermes.gabrielcmoris.com
+  icon: https://hermes-agent.nousresearch.com/docs/img/logo.png
+  index: /
+  is_uncontrolled: false
+  port_map: ""
+  scheme: http
+  store_app_id: flourishing_et
+  title:
+    custom: hermes-agent
+    en_us: hermes-agent
