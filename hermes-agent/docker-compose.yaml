@@ -11,9 +11,10 @@ services:
         limits:
           memory: 8063M
     environment:
+      - API_SERVER_CORS_ORIGIN=*
       - API_SERVER_ENABLED=true
       - API_SERVER_HOST=0.0.0.0
-      - API_SERVER_KEY=sk_hermes_GENERATE_AN_API_KEY
+      - API_SERVER_KEY=sk_hermes_32_CHAR_TOKEN
       - API_SERVER_PORT=8642
       - HERMES_HOME=/root/.hermes
       - MESSAGING_CWD=/root/.hermes/workspace
@@ -25,6 +26,9 @@ services:
     ports:
       - target: 8642
         published: "8642"
+        protocol: tcp
+      - target: 3000
+        published: "3000"
         protocol: tcp
     privileged: true
     restart: unless-stopped
@@ -38,53 +42,29 @@ services:
     cap_add: []
     networks:
       - ollama
-  hermes-workspace:
-    cpu_shares: 90
-    command: []
-    container_name: webui-hermes
-    depends_on:
-      hermes-agent:
-        condition: service_started
-        required: true
-    deploy:
-      resources:
-        limits:
-          memory: 8063M
-    environment:
-      - HERMES_AGENT_URL=http://hermes-agent:8642
-      - WORKSPACE_MODE=full
-      - OPENAI_API_KEY=sk_hermes_GENERATE_AN_API_KEY
-    hostname: webui-hermes
-    image: nousresearch/hermes-workspace:latest
-    labels:
-      icon: https://hermes-agent.nousresearch.com/docs/img/logo.png
-    ports:
-      - target: 3000
-        published: "3000"
-        protocol: tcp
-    privileged: true
-    restart: unless-stopped
-    volumes:
-      - type: bind
-        source: /DATA/AppData/agentHermes
-        target: /root/.hermes
-    devices: []
-    cap_add: []
-    networks:
-      - ollama
 networks:
   ollama:
     name: ollama
+    external: true
 x-casaos:
-  author: self
-  category: self
+  author: gabrielcmoris
+  category: AI_AGENTS
   hostname: hermes.gabrielcmoris.com
   icon: https://hermes-agent.nousresearch.com/docs/img/logo.png
   index: /
   is_uncontrolled: false
   port_map: ""
   scheme: http
-  store_app_id: flourishing_et
+  store_app_id: hermes-agent
+  tips:
+    custom: |-
+      ❗❗❗IMPORTANT❗❗❗
+      After container starts you must run:
+      1. hermes setup
+      2. git clone https://github.com/outsourc-e/hermes-workspace.git
+      3. cd hermes-workspace
+      4. pnpm install
+      5. pnpm dev
   title:
     custom: hermes-agent
     en_us: hermes-agent
