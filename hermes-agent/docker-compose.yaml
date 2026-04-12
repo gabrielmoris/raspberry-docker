@@ -1,4 +1,4 @@
-name: flourishing_et
+name: hermes-agent
 services:
   hermes-agent:
     cpu_shares: 90
@@ -38,7 +38,7 @@ services:
     cap_add: []
     networks:
       - ollama
-  hermes-webui:
+  hermes-workspace:
     cpu_shares: 90
     command: []
     container_name: webui-hermes
@@ -51,19 +51,16 @@ services:
         limits:
           memory: 8063M
     environment:
-      - HERMES_WEBUI_HOST=0.0.0.0
-      - HERMES_WEBUI_PASSWORD=YOUR_PASSWORD_FOR_WEBUI
-      - HERMES_WEBUI_PORT=8787
-      - HERMES_WEBUI_STATE_DIR=/webui-state
-      - OPENAI_API_BASE_URL=http://hermes-agent:8642/v1
+      - HERMES_AGENT_URL=http://hermes-agent:8642
+      - WORKSPACE_MODE=full
       - OPENAI_API_KEY=sk_hermes_GENERATE_AN_API_KEY
     hostname: webui-hermes
-    image: ghcr.io/nesquena/hermes-webui:latest
+    image: nousresearch/hermes-workspace:latest
     labels:
       icon: https://hermes-agent.nousresearch.com/docs/img/logo.png
     ports:
-      - target: 8787
-        published: "8787"
+      - target: 3000
+        published: "3000"
         protocol: tcp
     privileged: true
     restart: unless-stopped
