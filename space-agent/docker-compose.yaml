@@ -1,27 +1,50 @@
-version: '3.8'
-
+name: space_agent
 services:
   space-agent:
-    build: .
-    ports:
-      - "${PORT:-3000}:3000"
+    cpu_shares: 90
+    command: []
+    container_name: space-agent
+    deploy:
+      resources:
+        limits:
+          memory: 8063M
     environment:
-      - HOST=${HOST:-0.0.0.0}
-      - PORT=${PORT:-3000}
-      - WORKERS=${WORKERS:-1}
-      - CUSTOMWARE_PATH=${CUSTOMWARE_PATH:-./customware}
-      - CUSTOMWARE_WATCHDOG=${CUSTOMWARE_WATCHDOG:-true}
-      - SINGLE_USER_APP=${SINGLE_USER_APP:-true}
-      - LOGIN_ALLOWED=${LOGIN_ALLOWED:-true}
-      - ALLOW_GUEST_USERS=${ALLOW_GUEST_USERS:-false}
-      - CLOUD_SHARE_ALLOWED=${CLOUD_SHARE_ALLOWED:-false}
-      - CLOUD_SHARE_URL=${CLOUD_SHARE_URL:-share.space-agent.ai}
-      - CUSTOMWARE_GIT_HISTORY=${CUSTOMWARE_GIT_HISTORY:-true}
-      - GIT_BACKEND=${GIT_BACKEND:-auto}
-      - GIT_URL=${GIT_URL:-""}
-      - USER_FOLDER_SIZE_LIMIT_BYTES=${USER_FOLDER_SIZE_LIMIT_BYTES:-0}
-      - SPACE_AUTH_DATA_DIR=${SPACE_AUTH_DATA_DIR:-/app/server/data}
-    volumes:
-      - ./customware:/app/customware:rw
-      - ./data:/app/server/data:rw
+      - CUSTOMWARE_PATH=/app/customware
+      - GIT_BACKEND=auto
+      - HOST=0.0.0.0
+      - SPACE_AUTH_DATA_DIR=/app/server/data
+    hostname: space-agent
+    image: gabrielcmoris/agent-sp-space:latest
+    labels:
+      icon: https://space-agent.ai/pages/res/astronaut_no_bg.webp
+    ports:
+      - target: 3000
+        published: "4444"
+        protocol: tcp
+    privileged: true
     restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/spaceAgent/customware
+        target: /app/customware
+      - type: bind
+        source: /DATA/AppData/spaceAgent/server
+        target: /app/server/data
+    devices: []
+    cap_add: []
+    network_mode: bridge
+x-casaos:
+  author: self
+  category: self
+  hostname: ""
+  icon: https://space-agent.ai/pages/res/astronaut_no_bg.webp
+  index: /
+  is_uncontrolled: false
+  port_map: ""
+  scheme: http
+  store_app_id: glorious_ubs
+  title:
+    custom: ""
+    en_us: space-agent
+volumes:
+  space_agent_data:
