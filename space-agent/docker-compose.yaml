@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  space-agent:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - HOST=${HOST:-0.0.0.0}
+      - PORT=${PORT:-3000}
+      - WORKERS=${WORKERS:-1}
+      - CUSTOMWARE_PATH=${CUSTOMWARE_PATH:-./customware}
+      - CUSTOMWARE_WATCHDOG=${CUSTOMWARE_WATCHDOG:-true}
+      - SINGLE_USER_APP=${SINGLE_USER_APP:-true}
+      - LOGIN_ALLOWED=${LOGIN_ALLOWED:-true}
+      - ALLOW_GUEST_USERS=${ALLOW_GUEST_USERS:-false}
+      - CLOUD_SHARE_ALLOWED=${CLOUD_SHARE_ALLOWED:-false}
+      - CLOUD_SHARE_URL=${CLOUD_SHARE_URL:-share.space-agent.ai}
+      - CUSTOMWARE_GIT_HISTORY=${CUSTOMWARE_GIT_HISTORY:-true}
+      - GIT_BACKEND=${GIT_BACKEND:-auto}
+      - GIT_URL=${GIT_URL:-""}
+      - USER_FOLDER_SIZE_LIMIT_BYTES=${USER_FOLDER_SIZE_LIMIT_BYTES:-0}
+      - SPACE_AUTH_DATA_DIR=${SPACE_AUTH_DATA_DIR:-/app/server/data}
+    volumes:
+      - ./customware:/app/customware:rw
+      - ./data:/app/server/data:rw
+    restart: unless-stopped
