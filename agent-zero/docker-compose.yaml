@@ -1,4 +1,4 @@
-name: festive_alby
+name: agent_zero
 services:
   agent-zero:
     cpu_shares: 90
@@ -13,7 +13,7 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     hostname: agent-zero
-    image: agent0ai/agent-zero:ready
+    image: agent0ai/agent-zero:latest
     labels:
       icon: https://avatars.githubusercontent.com/u/216033749?s=280&v=4
     ports:
@@ -28,7 +28,7 @@ services:
     volumes:
       - type: bind
         source: /DATA/AppData/agent-zero
-        target: /a0
+        target: /a0/usr
     devices: []
     cap_add: []
     networks:
@@ -45,7 +45,7 @@ x-casaos:
   is_uncontrolled: false
   port_map: ""
   scheme: https
-  store_app_id: festive_alby
+  store_app_id: agent_zero
   title:
     custom: ""
     en_us: agent-zero
